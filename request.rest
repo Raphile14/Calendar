@@ -1,0 +1,35 @@
+### Get Calendars
+GET http://localhost:8000/api/calendars
+Content-Type: application/json
+
+{
+
+}
+
+### Create Calendar Entry
+POST http://localhost:8000/api/calendars
+Content-Type: application/json
+
+{
+    "title": "Title",
+    "body": "Body",
+    "time": "2022-02-23"
+}
+
+### Update Calendar Entry
+PUT http://localhost:8000/api/calendars/1
+Content-Type: application/json
+
+{
+    "title": "Title3",
+    "body": "Body",
+    "time": "2022-02-22"
+}
+
+### Delete Calendar Entry
+DELETE http://localhost:8000/api/calendars/4
+Content-Type: application/json
+
+{
+    
+}

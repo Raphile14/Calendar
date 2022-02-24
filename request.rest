@@ -1,5 +1,5 @@
 ### Get Calendars
-GET http://localhost:8000/api/calendars
+GET http://localhost:8000/api/calendars?month=2&year=2022&nextMonth=3&nextYear=2022
 Content-Type: application/json
 
 {
@@ -13,7 +13,8 @@ Content-Type: application/json
 {
     "title": "Title",
     "body": "Body",
-    "time": "2022-02-23"
+    "days": ["2022-02-01", "2022-02-05"],
+    "override": false
 }
 
 ### Update Calendar Entry

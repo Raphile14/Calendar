@@ -1,8 +1,8 @@
 <template>
     <b-container
-        class="border border-dark calendar__container centered"
+        class="border__main calendar__container centered modal-overlay"
         align-v="center"
-    >
+    >        
         <b-row>
             <b-col class="left__side">
                 <InputForm
@@ -11,6 +11,7 @@
                     :nextMonth="nextMonth"
                     :offset="offset"
                     v-on:modifyOffset="modifyOffset($event)"
+                    v-on:refreshCalendar="refreshCalendar()"
                 />
             </b-col>
             <b-col>
@@ -18,6 +19,7 @@
                     :currentMonth="currentMonth"
                     :previousMonth="previousMonth"
                     :nextMonth="nextMonth"
+                    :data="data"
                     v-on:resetOffset="resetOffset()"
                 />
             </b-col>
@@ -28,12 +30,43 @@
 <script>
 export default {
     name: "Main",
+    async fetch() {
+        // Get data from backend
+        let response = await this.$axios.get(
+            `/api/calendars?month=${
+                this.currentMonth.now.getMonth() + 1
+            }&year=${this.currentMonth.now.getFullYear()}&nextMonth=${
+                this.nextMonth.next.getMonth() + 1
+            }&nextYear=${this.nextMonth.next.getFullYear()}`
+        );
+        let newData = [];
+
+        // Generate array of events for each day
+        for (let x = 1; x <= this.currentMonth.totalDays; x++) {
+            newData[x] = [];
+        }
+
+        // Assign events per day
+        for (let x = 0; x < response.data.length; x++) {
+            let date = new Date(response.data[x].time);
+            let event = response.data[x];
+
+            // Slice string if longer than 5 characters
+            if (event.title.length > 6) {
+                event.title = `${event.title.substring(0, 4)}...`;
+            }
+            newData[date.getDate()].push(event);
+        }
+
+        this.data = newData;
+    },
     data() {
         return {
             currentMonth: {},
             previousMonth: {},
             nextMonth: {},
             offset: 0,
+            data: [],
         };
     },
     created() {
@@ -44,16 +77,21 @@ export default {
             this.offset += value;
             this.generateData();
         },
+        refreshCalendar: function () {
+            this.generateData();
+        },
         resetOffset: function () {
             this.offset = 0;
             this.generateData();
         },
-        generateData: function () {
+        generateData: async function () {
             // Generate data for current month
             let now = new Date();
             now = new Date(`${now.getFullYear()} ${now.getMonth() + 1} 1`);
             let prev = new Date(`${now.getFullYear()} ${now.getMonth() + 1} 1`);
             let next = new Date(`${now.getFullYear()} ${now.getMonth() + 1} 1`);
+
+            // Set month offsets
             now.setMonth(now.getMonth() + this.offset);
             prev.setMonth(prev.getMonth() + this.offset);
             prev.setDate(0);
@@ -76,6 +114,7 @@ export default {
                     now.getMonth() + 1,
                     0
                 ).getDay(),
+                now,
             };
 
             // Generate last days of the previous month
@@ -96,11 +135,17 @@ export default {
             for (let x = 1; x < 7 - this.currentMonth.lastDay; x++) {
                 nextDays.push(x);
             }
+
+            // Assign values for next month
             this.nextMonth = {
                 month: next.getMonth() + 1,
                 year: next.getFullYear(),
                 nextDays,
+                next,
             };
+
+            // Fetch new data
+            await this.$fetch();
         },
     },
 };
@@ -110,7 +155,7 @@ export default {
 body {
     background-color: #fbfcff;
     color: #4b7d96;
-    font-weight: 600;
+    font-weight: 700;
 }
 button {
     padding: 0;
@@ -118,18 +163,27 @@ button {
     background: none;
 }
 .centered {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    margin-top: 1%;
+    width: 100%;
 }
 .calendar__container {
     padding: 5%;
 }
-.border {
+.border__main {
+    border: 1px solid #4b7d96;
     border-radius: 1%;
 }
 .left__side {
     max-width: 40%;
 }
+/* .modal-overlay {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    background-color: #000000da;
+} */
 </style>

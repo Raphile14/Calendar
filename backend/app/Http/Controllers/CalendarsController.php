@@ -9,16 +9,43 @@ class CalendarsController extends Controller
 {
     public function get()
     {
-        return Calendars::all();
+        $month = request('month');
+        $year = request('year');
+        $from = date("{$year}-{$month}-1");
+        $nextMonth = request('nextMonth');
+        $nextYear = request('nextYear');
+        $to = date("{$nextYear}-{$nextMonth}-1");
+        return Calendars::where('time', '>=', $from)
+            ->where('time', '<', $to)
+            ->get();
     }
 
     public function post()
     {
-        Calendars::create([
-            'title' => request('title'),
-            'body' => request('body'),
-            'time' => request('time')
-        ]);
+        $data = array();
+
+        // Override if true        
+        if (request('override')) {
+            $override = array();
+            foreach (request('days') as $time) {
+                array_push($override, $time);
+            }
+            Calendars::whereIn('time', $override)
+                ->delete();
+        }
+
+        // Insert data
+        foreach (request('days') as $time) {
+            $item = array();
+            $item['title'] = request('title');
+            $item['body'] = request('body');
+            $item['time'] = $time;
+            array_push($data, $item);
+        }
+        Calendars::insert($data);
+        return [
+            'status' => $data
+        ];
     }
 
     public function put(Calendars $calendar)

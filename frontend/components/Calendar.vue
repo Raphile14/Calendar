@@ -1,6 +1,14 @@
 <template>
     <div class="main">
-        <EventDayModal v-show="showModal" v-on:toggleModal="toggleModal()" />    
+        <EventDayModal
+            v-show="showModal"
+            v-on:toggleModal="toggleModal()"
+            v-on:refreshCalendar="refreshCalendar()"
+            :data="data"
+            :day="day"
+            :month="month"
+            :currentMonth="currentMonth"
+        />
         <div class="text-center">
             <button class="button__full" v-on:click="resetOffset()">
                 This Month
@@ -33,7 +41,7 @@
                     v-for="val in data[index]"
                     :key="`${val.id}`"
                 >
-                    {{ val.title }}
+                    {{ val.shortTitle }}
                 </p>
             </div>
             <div
@@ -52,28 +60,31 @@ import EventDayModal from "./EventDayModal.vue";
 export default {
     components: { EventDayModal },
     name: "Calendar",
-    props: ["previousMonth", "currentMonth", "nextMonth", "data"],
+    props: ["previousMonth", "currentMonth", "nextMonth", "data", "month"],
     data() {
         return {
             days: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-            showModal: false
+            showModal: false,
+            day: null,
         };
     },
     methods: {
-        toggleModal: function() {
+        toggleModal: function () {
             this.showModal = !this.showModal;
         },
         resetOffset: function () {
             this.$emit("resetOffset");
         },
         dateClicked: function (day) {
+            this.day = day;
             this.toggleModal();
             // alert(day);
         },
+        refreshCalendar: function () {
+            this.$emit("refreshCalendar");
+        },
     },
-    created() {
-        
-    },
+    created() {},
 };
 </script>
 

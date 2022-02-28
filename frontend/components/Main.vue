@@ -2,7 +2,7 @@
     <b-container
         class="border__main calendar__container centered modal-overlay"
         align-v="center"
-    >        
+    >
         <b-row>
             <b-col class="left__side">
                 <InputForm
@@ -10,6 +10,7 @@
                     :previousMonth="previousMonth"
                     :nextMonth="nextMonth"
                     :offset="offset"
+                    :month="month"
                     v-on:modifyOffset="modifyOffset($event)"
                     v-on:refreshCalendar="refreshCalendar()"
                 />
@@ -20,7 +21,9 @@
                     :previousMonth="previousMonth"
                     :nextMonth="nextMonth"
                     :data="data"
+                    :month="month"
                     v-on:resetOffset="resetOffset()"
+                    v-on:refreshCalendar="refreshCalendar()"
                 />
             </b-col>
         </b-row>
@@ -52,8 +55,9 @@ export default {
             let event = response.data[x];
 
             // Slice string if longer than 5 characters
+            event.shortTitle = event.title;
             if (event.title.length > 6) {
-                event.title = `${event.title.substring(0, 4)}...`;
+                event.shortTitle = `${event.title.substring(0, 4)}...`;
             }
             newData[date.getDate()].push(event);
         }
@@ -67,6 +71,20 @@ export default {
             nextMonth: {},
             offset: 0,
             data: [],
+            month: [
+                "January",
+                "February",
+                "March",
+                "April",
+                "May",
+                "June",
+                "July",
+                "August",
+                "September",
+                "October",
+                "November",
+                "December",
+            ],
         };
     },
     created() {

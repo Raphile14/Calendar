@@ -116,23 +116,9 @@ export default {
         BIconArrowBarLeft,
         BIconArrowBarRight,
     },
-    props: ["previousMonth", "currentMonth", "nextMonth", "offset"],
+    props: ["previousMonth", "currentMonth", "nextMonth", "offset", "month"],
     data() {
         return {
-            month: [
-                "January",
-                "February",
-                "March",
-                "April",
-                "May",
-                "June",
-                "July",
-                "August",
-                "September",
-                "October",
-                "November",
-                "December",
-            ],
             days: [
                 "Sunday",
                 "Monday",
